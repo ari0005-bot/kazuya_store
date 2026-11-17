@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍒</text></svg>" />
+  <title>Kazuya Store — Modern Kawaii Digital Store 🌸</title>
+
+  <!-- Google Fonts: Fredoka & Nunito -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap"
+    rel="stylesheet" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            pastelPink: '#F8C8DA',
+            cherryPink: '#E95D96',
+            darkRose: '#A52E5D',
+            softWhite: '#FFF5F7',
+            cozyBrown: '#795348',
+            cream: '#FDF8F5',
+          },
+          fontFamily: {
+            heading: ['"Fredoka"', 'cursive', 'sans-serif'],
+            body: ['"Nunito"', '"Poppins"', 'sans-serif'],
+          },
+          boxShadow: {
+            'boutique': '0 4px 20px -2px rgba(165, 46, 93, 0.08)',
+            'kawaii-lg': '0 14px 40px -4px rgba(233, 93, 150, 0.22)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- React 18 & Babel Standalone CDN -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    body {
+      background-color: #FFF5F7;
+      color: #4A2E2B;
+      background-image:
+        radial-gradient(rgba(233, 93, 150, 0.08) 1px, transparent 1px),
+        radial-gradient(rgba(248, 200, 218, 0.15) 1px, #FFF5F7 1px);
+      background-size: 24px 24px;
+      background-position: 0 0, 12px 12px;
+      font-family: 'Nunito', sans-serif;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      font-family: 'Fredoka', cursive, sans-serif;
+      letter-spacing: -0.01em;
+    }
+
+    .boutique-card {
+      background: #FFFFFF;
+      border: 1.5px solid rgba(248, 200, 218, 0.85);
+      box-shadow: 0 4px 20px -2px rgba(165, 46, 93, 0.06);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .boutique-card:hover {
+      transform: translateY(-4px);
+      border-color: #E95D96;
+      box-shadow: 0 16px 36px -6px rgba(233, 93, 150, 0.18);
+    }
+
+    .boutique-btn {
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .boutique-btn:active {
+      transform: scale(0.97);
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #FFF5F7;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #F8C8DA;
+      border-radius: 9999px;
+      border: 2px solid #FFF5F7;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #E95D96;
+    }
+  </style>
+</head>
+
+<body class="selection:bg-[#F8C8DA] selection:text-[#A52E5D] antialiased overflow-x-hidden min-h-screen">
+
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useMemo } = React;
+
+    const STORE_PHONE = '6285724402538';
+    const STORE_PHONE_DISPLAY = '085724402538';
+
+    function generateOrderMessage({ productName, packageName, price }) {
+      return `Halo Kazuya Store! ♡\n\nSaya ingin memesan:\n\nProduk: ${productName}\nPaket: ${packageName}\nHarga: ${price}\n\nMohon informasi ketersediaan dan cara pemesanannya.\n\nTerima kasih!`;
+    }
+
+    function createWhatsAppOrderUrl({ productName, packageName, price }) {
+      const message = generateOrderMessage({ productName, packageName, price });
+      return `https://wa.me/${STORE_PHONE}?text=${encodeURIComponent(message)}`;
+    }
+
+    function createGeneralWhatsAppUrl(custom) {
+      const msg = custom || `Halo Kazuya Store! ♡\n\nSaya ingin bertanya seputar produk digital yang tersedia.\n\nBisa dibantu? Terima kasih!`;
+      return `https://wa.me/${STORE_PHONE}?text=${encodeURIComponent(msg)}`;
+    }
+
+    // ==========================================
+    // OFFICIAL SVG LOGOS (WhatsApp, Instagram, TikTok, Telegram, CapCut, Netflix)
+    // ==========================================
+    function WhatsAppOfficialLogo({ className = "w-5 h-5", variant = "colored" }) {
+      if (variant === "white") {
+        return (
+          <svg viewBox="0 0 24 24" className={className} fill="currentColor">
+            <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2ZM12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.16 12.04 20.16C10.67 20.16 9.32 19.8 8.14 19.11L7.84 18.93L4.72 19.75L5.55 16.71L5.35 16.39C4.59 15.18 4.19 13.56 4.19 11.91C4.19 7.37 7.89 3.67 12.05 3.67ZM8.53 7.33C8.37 7.33 8.1 7.4 7.87 7.65C7.65 7.9 7.02 8.49 7.02 9.7C7.02 10.91 7.9 12.08 8.02 12.24C8.15 12.41 9.72 14.83 12.13 15.87C12.7 16.12 13.15 16.27 13.49 16.38C14.07 16.56 14.59 16.54 15.01 16.47C15.48 16.4 16.45 15.88 16.65 15.31C16.86 14.74 16.86 14.25 16.79 14.15C16.73 14.05 16.57 13.98 16.32 13.86C16.07 13.73 14.84 13.13 14.61 13.05C14.39 12.96 14.22 12.92 14.06 13.17C13.89 13.41 13.42 13.98 13.27 14.15C13.13 14.31 12.98 14.33 12.74 14.21C12.49 14.08 11.69 13.82 10.74 12.98C10.01 12.32 9.51 11.51 9.37 11.27C9.22 11.02 9.35 10.89 9.48 10.76C9.59 10.65 9.72 10.47 9.85 10.33C9.97 10.18 10.01 10.08 10.09 9.92C10.18 9.75 10.14 9.61 10.07 9.49C10.01 9.37 9.53 8.19 9.33 7.71C9.13 7.23 8.93 7.29 8.78 7.29C8.63 7.29 8.46 7.29 8.53 7.33Z" />
+          </svg>
+        );
+      }
+      return (
+        <svg viewBox="0 0 48 48" className={className} fill="none">
+          <circle cx="24" cy="24" r="24" fill="#25D366" />
+          <path
+            d="M24 8.5C15.44 8.5 8.5 15.44 8.5 24C8.5 26.86 9.27 29.54 10.61 31.86L8.5 39.5L16.36 37.44C18.6 38.69 21.2 39.5 24 39.5C32.56 39.5 39.5 32.56 39.5 24C39.5 15.44 32.56 8.5 24 8.5ZM31.87 29.89C31.54 30.82 30.15 31.63 29.41 31.74C28.75 31.84 27.91 31.88 26.97 31.58C26.4 31.4 25.66 31.15 24.69 30.73C20.61 28.98 17.95 24.84 17.75 24.57C17.54 24.3 16.12 22.42 16.12 20.48C16.12 18.53 17.11 17.58 17.47 17.18C17.83 16.78 18.26 16.67 18.52 16.67C18.78 16.67 19.04 16.68 19.26 16.69C19.5 16.7 19.81 16.6 20.08 17.26C20.36 17.94 21.04 19.61 21.13 19.79C21.22 19.97 21.29 20.19 21.16 20.45C21.03 20.71 20.94 20.84 20.74 21.07C20.54 21.3 20.32 21.57 20.14 21.75C19.93 21.96 19.7 22.18 19.94 22.6C20.18 23.01 21.01 24.37 22.23 25.46C23.8 26.85 25.07 27.3 25.5 27.48C25.93 27.66 26.18 27.62 26.42 27.34C26.66 27.06 27.45 26.14 27.73 25.75C28.01 25.36 28.3 25.42 28.69 25.56C29.08 25.7 31.13 26.71 31.54 26.92C31.95 27.13 32.22 27.23 32.32 27.4C32.42 27.57 32.42 28.4 32.09 29.33L31.87 29.89Z"
+            fill="#FFFFFF"
+          />
+        </svg>
+      );
+    }
+
+    function InstagramOfficialLogo({ className = "w-6 h-6" }) {
+      return (
+        <svg viewBox="0 0 48 48" className={className} fill="none">
+          <defs>
+            <radialGradient id="igGrad_preview" cx="30%" cy="107%" r="130%">
+              <stop offset="0%" stopColor="#fdf497" />
+              <stop offset="10%" stopColor="#fdf497" />
+              <stop offset="50%" stopColor="#fd5949" />
+              <stop offset="68%" stopColor="#d6249f" />
+              <stop offset="100%" stopColor="#285AEB" />
+            </radialGradient>
+          </defs>
+          <rect width="48" height="48" rx="14" fill="url(#igGrad_preview)" />
+          <rect x="11" y="11" width="26" height="26" rx="7" stroke="#FFFFFF" strokeWidth="2.8" fill="none" />
+          <circle cx="24" cy="24" r="6.5" stroke="#FFFFFF" strokeWidth="2.8" fill="none" />
+          <circle cx="31.5" cy="16.5" r="1.6" fill="#FFFFFF" />
+        </svg>
+      );
+    }
+
+    function TikTokOfficialLogo({ className = "w-6 h-6" }) {
+      return (
+        <svg viewBox="0 0 48 48" className={className} fill="none">
+          <rect width="48" height="48" rx="14" fill="#010101" />
+          <path
+            d="M26.5 13 C27.5 16 30 18.5 33 19 L33 23 C30.5 23 28 22 26.5 20.8 L26.5 29 C26.5 33.5 22.5 36.5 18 35 C14.5 34 12.5 30.5 13.5 27 C14.5 23.5 18 21.5 22 22.5 L22 26 C19.5 25.5 17 27 16.5 29 C16 31 18 32.5 20 32.5 C22 32.5 23.5 31 23.5 29 L23.5 13 Z"
+            fill="#25F4EE"
+            transform="translate(-1, 0)"
+          />
+          <path
+            d="M26.5 13 C27.5 16 30 18.5 33 19 L33 23 C30.5 23 28 22 26.5 20.8 L26.5 29 C26.5 33.5 22.5 36.5 18 35 C14.5 34 12.5 30.5 13.5 27 C14.5 23.5 18 21.5 22 22.5 L22 26 C19.5 25.5 17 27 16.5 29 C16 31 18 32.5 20 32.5 C22 32.5 23.5 31 23.5 29 L23.5 13 Z"
+            fill="#FE2C55"
+            transform="translate(1, 0)"
+          />
+          <path
+            d="M26.5 13 C27.5 16 30 18.5 33 19 L33 23 C30.5 23 28 22 26.5 20.8 L26.5 29 C26.5 33.5 22.5 36.5 18 35 C14.5 34 12.5 30.5 13.5 27 C14.5 23.5 18 21.5 22 22.5 L22 26 C19.5 25.5 17 27 16.5 29 C16 31 18 32.5 20 32.5 C22 32.5 23.5 31 23.5 29 L23.5 13 Z"
+            fill="#FFFFFF"
+          />
+        </svg>
+      );
+    }
+
+    function TelegramOfficialLogo({ className = "w-6 h-6" }) {
+      return (
+        <svg viewBox="0 0 48 48" className={className} fill="none">
+          <defs>
+            <linearGradient id="tgGrad_preview" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#2AABEE" />
+              <stop offset="100%" stopColor="#229ED9" />
+            </linearGradient>
+          </defs>
+          <circle cx="24" cy="24" r="24" fill="url(#tgGrad_preview)" />
+          <path
+            d="M10 23.5 L36 13.5 L31 35 C30.5 36.5 29 36.5 28 35.5 L21.5 30.5 L17.5 34.5 C17 35 16.5 35 16.3 34 L17.2 27.5 L29.5 16.5 C30 16 29.5 15.5 28.8 16 L13.5 25.5 L10 23.5 Z"
+            fill="#FFFFFF"
+          />
+        </svg>
+      );
+    }
+
+    function CapCutOfficialLogo({ className = "h-7" }) {
+      return (
+        <div className={`inline-flex items-center gap-2 select-none ${className}`}>
+          <svg viewBox="0 0 100 100" className="w-7 h-7 shrink-0" fill="none">
+            <rect width="100" height="100" rx="20" fill="#111111" />
+            <path d="M26 32 C26 29 28 27 31 27 L69 27 C72 27 74 29 74 32 L74 38 C74 41 72 43 69 43 L42 43 L68 59 C70 60 71 63 71 66 L71 70 C71 73 69 75 66 75 L28 75 C25 75 23 73 23 70 L23 64 C23 61 25 59 28 59 L55 59 L29 43 C27 42 26 39 26 36 Z" fill="#FFFFFF" />
+          </svg>
+          <span className="font-heading font-extrabold text-xl text-[#111111] tracking-tight">CapCut</span>
+        </div>
+      );
+    }
+
+    function NetflixOfficialLogo({ className = "h-6" }) {
+      return (
+        <div className={`inline-flex items-center select-none ${className}`}>
+          <span className="font-sans font-black tracking-widest text-[#E50914] text-xl uppercase" style={{ letterSpacing: '0.1em' }}>
+            NETFLIX
+          </span>
+        </div>
+      );
+    }
+
+    function CherryVector({ className = "w-4 h-4" }) {
+      return (
+        <svg viewBox="0 0 24 24" className={className} fill="none">
+          <path d="M12 4 C14 2 17 2 19 4 C18 6 15 6 12 4 Z" fill="#66B13D" />
+          <path d="M12 4 C10 8 8 12 7.5 15" stroke="#4D7F28" strokeWidth="1.8" strokeLinecap="round" />
+          <path d="M12 4 C13.5 8 16 12 16.5 15" stroke="#4D7F28" strokeWidth="1.8" strokeLinecap="round" />
+          <circle cx="7.5" cy="16.5" r="4.5" fill="#E92C5E" />
+          <circle cx="16.5" cy="16.5" r="4.5" fill="#E92C5E" />
+          <circle cx="6" cy="15" r="1.2" fill="#FFFFFF" opacity="0.8" />
+          <circle cx="15" cy="15" r="1.2" fill="#FFFFFF" opacity="0.8" />
+        </svg>
+      );
+    }
+
+    // Main App Component
+    function App() {
+      const capcutPackages = [
+        { name: '7 Hari Sharing', price: 'Rp 5.000', badge: 'Tugas Singkat', isPop: false },
+        { name: '1 Bulan Sharing', price: 'Rp 14.000', badge: 'Terlaris', isPop: true },
+        { name: '7 Hari Privat', price: 'Rp 7.000', badge: 'Privat Akses', isPop: false },
+        { name: '1 Bulan Privat', price: 'Rp 20.000', badge: 'Bebas Antre', isPop: true },
+      ];
+
+      const netflix1U = [
+        { dur: '1 Hari', price: 'Rp 2.500', name: '1 Hari — 1 User' },
+        { dur: '3 Hari', price: 'Rp 5.500', name: '3 Hari — 1 User' },
+        { dur: '7 Hari', price: 'Rp 8.900', name: '7 Hari — 1 User' },
+        { dur: '1 Bulan', price: 'Rp 24.000', name: '1 Bulan — 1 User' },
+      ];
+
+      const netflix2U = [
+        { dur: '1 Hari', price: 'Rp 2.000', name: '1 Hari — 2 User' },
+        { dur: '3 Hari', price: 'Rp 4.500', name: '3 Hari — 2 User' },
+        { dur: '7 Hari', price: 'Rp 8.000', name: '7 Hari — 2 User' },
+        { dur: '1 Bulan', price: 'Rp 16.000', name: '1 Bulan — 2 User' },
+      ];
+
+      const [openFaq, setOpenFaq] = useState(0);
+
+      const handleOrder = (prod, pkg, price) => {
+        window.open(createWhatsAppOrderUrl({ productName: prod, packageName: pkg, price }), '_blank');
+      };
+
+      return (
+        <div className="min-h-screen flex flex-col">
+          {/* Header */}
+          <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#F8C8DA]/70 py-2.5">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between">
+              <a href="#hero" className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-full p-0.5 bg-gradient-to-tr from-[#E95D96] to-[#F8C8DA] overflow-hidden shadow-sm">
+                  <img src="anime.png" alt="Kazuya Store" className="w-full h-full object-cover object-top rounded-full" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="font-heading text-xl sm:text-2xl font-bold text-[#A52E5D] flex items-center gap-1">
+                    Kazuya Store
+                    <span className="text-[10px] text-[#E95D96] font-semibold bg-[#FFEAF1] px-1.5 py-0.2 rounded-full border border-[#F8C8DA]">
+                      公式
+                    </span>
+                  </span>
+                  <span className="text-[9px] uppercase tracking-widest text-[#4A2E2B]/70 font-semibold -mt-1">
+                    カズヤストア • Digital Store
+                  </span>
+                </div>
+              </a>
+
+              <a
+                href={createGeneralWhatsAppUrl()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="boutique-btn bg-[#25D366] hover:bg-[#20ba5a] text-white px-4 py-2 rounded-full font-bold text-xs shadow-sm flex items-center gap-2"
+              >
+                <WhatsAppOfficialLogo className="w-4 h-4" variant="white" />
+                <span>Order WA: {STORE_PHONE_DISPLAY}</span>
+              </a>
+            </div>
+          </header>
+
+          {/* Hero Section */}
+          <section id="hero" className="pt-10 pb-12 px-4 max-w-7xl mx-auto">
+            {/* Top Announcement Bar */}
+            <div className="flex justify-center lg:justify-start mb-4">
+              <div className="inline-flex items-center gap-2 px-3 py-0.5 rounded-full bg-white border border-[#F8C8DA] text-xs font-bold text-[#A52E5D] shadow-sm">
+                <span className="w-2 h-2 rounded-full bg-[#E95D96] animate-ping" />
+                <CherryVector className="w-3.5 h-3.5" />
+                <span>Kazuya Store Resmi</span>
+                <span className="text-[10px] text-[#E95D96] bg-[#FFEAF1] px-2 py-0.2 rounded-full font-mono">
+                  カズヤストア
+                </span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+
+              <div className="lg:col-span-7 text-center lg:text-left">
+                <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold text-[#A52E5D] leading-tight">
+                  Your Digital Needs, <br />
+                  <span className="text-[#E95D96]">
+                    Made Cutely! 🌸
+                  </span>
+                </h1>
+                <p className="mt-3.5 text-sm sm:text-base text-[#4A2E2B]/85 max-w-lg mx-auto lg:mx-0 leading-relaxed">
+                  Layanan <strong>CapCut Premium</strong> & <strong>Netflix</strong> resmi dengan aktivasi kilat, durasi fleksibel, dan garansi akun aktif.
+                </p>
+
+                <div className="mt-5 flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
+                  <a
+                    href="#poster-katalog"
+                    className="boutique-btn px-6 py-2.5 rounded-xl bg-[#E95D96] hover:bg-[#D13B76] text-white font-bold font-heading text-xs sm:text-sm shadow-sm"
+                  >
+                    Pilihan Paket Populer ↓
+                  </a>
+                  <a
+                    href={createGeneralWhatsAppUrl()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="boutique-btn px-5 py-2.5 rounded-xl bg-white text-[#4A2E2B] font-bold text-xs sm:text-sm border border-[#F8C8DA] shadow-sm flex items-center justify-center gap-2"
+                  >
+                    <WhatsAppOfficialLogo className="w-4 h-4" />
+                    <span>Chat Admin ({STORE_PHONE_DISPLAY})</span>
+                  </a>
+                </div>
+
+                {/* Social Media Quick Bar */}
+                <div className="mt-5 flex items-center justify-center lg:justify-start gap-2.5 text-xs">
+                  <span className="text-[11px] font-bold text-[#4A2E2B]/70 uppercase tracking-wider">
+                    Sosial Media Resmi:
+                  </span>
+                  <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="boutique-btn p-1 rounded-lg bg-white border border-[#F8C8DA] shadow-sm hover:scale-105" title="Official Instagram">
+                    <InstagramOfficialLogo className="w-5 h-5" />
+                  </a>
+                  <a href="https://tiktok.com" target="_blank" rel="noopener noreferrer" className="boutique-btn p-1 rounded-lg bg-white border border-[#F8C8DA] shadow-sm hover:scale-105" title="Official TikTok">
+                    <TikTokOfficialLogo className="w-5 h-5" />
+                  </a>
+                  <a href="https://t.me" target="_blank" rel="noopener noreferrer" className="boutique-btn p-1 rounded-lg bg-white border border-[#F8C8DA] shadow-sm hover:scale-105" title="Official Telegram">
+                    <TelegramOfficialLogo className="w-5 h-5" />
+                  </a>
+                  <a href={createGeneralWhatsAppUrl()} target="_blank" rel="noopener noreferrer" className="boutique-btn p-1 rounded-lg bg-white border border-[#F8C8DA] shadow-sm hover:scale-105" title="Official WhatsApp">
+                    <WhatsAppOfficialLogo className="w-5 h-5" />
+                  </a>
+                </div>
+
+                <div className="mt-6 pt-4 border-t border-[#F8C8DA]/60 grid grid-cols-2 gap-2.5 max-w-md mx-auto lg:mx-0 text-left text-xs font-bold text-[#4A2E2B]">
+                  <div className="bg-white p-2.5 rounded-xl border border-[#F8C8DA]/70 flex items-center gap-2">
+                    <CherryVector className="w-4 h-4 shrink-0" />
+                    <div>
+                      <p className="text-[11px] text-[#A52E5D]">Harap sangat bersabar</p>
+                      <p className="text-[9px] text-[#4A2E2B]/60 font-normal">Akun diproses teliti</p>
+                    </div>
+                  </div>
+                  <div className="bg-white p-2.5 rounded-xl border border-[#F8C8DA]/70 flex items-center gap-2">
+                    <span className="text-amber-500 text-sm">⚡</span>
+                    <div>
+                      <p className="text-[11px] text-[#E95D96]">Fast Respon</p>
+                      <p className="text-[9px] text-[#4A2E2B]/60 font-normal">5-15 Menit</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Anime Character Showcase */}
+              <div className="lg:col-span-5 flex justify-center">
+                <div className="w-64 sm:w-76 md:w-84 rounded-3xl p-2.5 bg-white border border-[#F8C8DA] shadow-boutique">
+                  <div className="bg-gradient-to-b from-[#FFF5F7] to-[#FDF8F5] rounded-2xl overflow-hidden pt-2 flex items-end justify-center">
+                    <img
+                      src="anime.png"
+                      alt="Kazuya Store Mascot"
+                      className="w-full h-auto max-h-[380px] sm:max-h-[420px] object-contain select-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </section>
+
+          {/* Popular Packages Showcase */}
+          <section id="poster-katalog" className="py-12 bg-white/50 border-t border-b border-[#F8C8DA]/60">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6">
+
+              <div className="text-center max-w-xl mx-auto mb-8">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFEAF1] border border-[#F8C8DA] text-[11px] font-bold text-[#A52E5D] mb-2">
+                  <CherryVector className="w-3.5 h-3.5" />
+                  <span>Katalog Resmi Toko</span>
+                </div>
+                <h2 className="font-heading text-2xl sm:text-3xl font-bold text-[#A52E5D]">
+                  Pilihan Paket Populer
+                </h2>
+                <p className="text-xs text-[#4A2E2B]/80 mt-1">
+                  Klik pada paket untuk langsung memesan ke WhatsApp admin.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                {/* CapCut Card */}
+                <div className="boutique-card rounded-2xl p-5 sm:p-6 bg-white border border-[#F8C8DA]">
+                  <div className="flex items-center justify-between pb-3.5 border-b border-[#F8C8DA]/60 mb-4">
+                    <CapCutOfficialLogo />
+                    <span className="text-[10px] font-bold text-[#A52E5D] bg-[#FFEAF1] px-2 py-0.5 rounded-full border border-[#F8C8DA]">
+                      Katalog Harga
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2.5 mb-4">
+                    {capcutPackages.map((c, idx) => (
+                      <div
+                        key={idx}
+                        onClick={() => handleOrder('CapCut Premium', c.name, c.price)}
+                        className={`boutique-btn p-3 rounded-xl border cursor-pointer ${c.isPop ? 'bg-[#FFF5F7] border-[#E95D96]' : 'bg-white border-[#F8C8DA] hover:border-[#E95D96]/60'
+                          }`}
+                      >
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-xs font-bold text-[#4A2E2B]">{c.name}</span>
+                          <span className="text-[9px] font-semibold px-1.5 py-0.2 bg-[#FFEAF1] text-[#A52E5D] rounded-full">{c.badge}</span>
+                        </div>
+                        <p className="font-heading text-base font-bold text-[#E95D96] mt-1">{c.price}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="pt-3 border-t border-[#F8C8DA]/60 flex items-center justify-between text-xs">
+                    <span className="text-[11px] text-[#A52E5D] font-bold">Harap sangat bersabar saat order • Fast Respon</span>
+                    <a
+                      href={createWhatsAppOrderUrl({ productName: 'CapCut Premium', packageName: 'Konsultasi Paket', price: 'Mulai Rp 5.000' })}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="boutique-btn bg-[#25D366] text-white px-3 py-1.5 rounded-lg text-xs font-bold"
+                    >
+                      Pesan via WA
+                    </a>
+                  </div>
+                </div>
+
+                {/* Netflix Card */}
+                <div className="boutique-card rounded-2xl p-5 sm:p-6 bg-white border border-[#E5C7A3]">
+                  <div className="flex items-center justify-between pb-3.5 border-b border-[#E5C7A3]/60 mb-4">
+                    <NetflixOfficialLogo />
+                    <span className="text-[10px] font-bold text-[#8A241D] bg-[#FFF2E6] px-2 py-0.5 rounded-full border border-[#E5C7A3]">
+                      Movie Time
+                    </span>
+                  </div>
+
+                  <div className="space-y-2.5 mb-4">
+                    <div className="bg-[#FFFDF7] rounded-xl border border-[#E5C7A3] p-2.5">
+                      <p className="text-[11px] font-bold text-[#6B4423] mb-1.5">Paket 1 User (PIN Pribadi)</p>
+                      <div className="grid grid-cols-4 gap-1.5">
+                        {netflix1U.map((item, idx) => (
+                          <div
+                            key={idx}
+                            onClick={() => handleOrder('Netflix Premium', item.name, item.price)}
+                            className="p-1.5 rounded-lg bg-white border border-[#E5C7A3] text-center hover:border-[#8A241D] cursor-pointer"
+                          >
+                            <p className="text-[10px] text-[#4A2E2B]/70">{item.dur}</p>
+                            <p className="font-heading text-xs font-bold text-[#8A241D]">{item.price}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="bg-[#FFFDF7] rounded-xl border border-[#E5C7A3] p-2.5">
+                      <p className="text-[11px] font-bold text-[#6B4423] mb-1.5">Paket 2 User (Paling Hemat)</p>
+                      <div className="grid grid-cols-4 gap-1.5">
+                        {netflix2U.map((item, idx) => (
+                          <div
+                            key={idx}
+                            onClick={() => handleOrder('Netflix Premium', item.name, item.price)}
+                            className="p-1.5 rounded-lg bg-white border border-[#E5C7A3] text-center hover:border-[#8A241D] cursor-pointer"
+                          >
+                            <p className="text-[10px] text-[#4A2E2B]/70">{item.dur}</p>
+                            <p className="font-heading text-xs font-bold text-[#8A241D]">{item.price}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-3 border-t border-[#E5C7A3]/60 flex items-center justify-between text-xs">
+                    <span className="text-[11px] text-[#6B4423] font-bold">Semi Privat 1 Bulan — Rp 26.500</span>
+                    <a
+                      href={createWhatsAppOrderUrl({ productName: 'Netflix Premium', packageName: 'Konsultasi Paket', price: 'Mulai Rp 2.000' })}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="boutique-btn bg-[#25D366] text-white px-3 py-1.5 rounded-lg text-xs font-bold"
+                    >
+                      Pesan via WA
+                    </a>
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+          </section>
+
+          {/* Footer */}
+          <footer className="bg-white border-t border-[#F8C8DA] py-8 text-center text-xs text-[#4A2E2B]/80 mt-auto">
+            <div className="max-w-7xl mx-auto px-4">
+              <p className="font-heading text-base font-bold text-[#A52E5D]">Kazuya Store</p>
+              <p className="text-[11px] mb-3">WhatsApp Resmi: {STORE_PHONE_DISPLAY} • Jam Operasional: 08:00 - 23:00 WIB</p>
+
+              {/* Official Social Media in Footer */}
+              <div className="flex items-center justify-center gap-3 mb-4">
+                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="boutique-btn p-1.5 rounded-xl bg-white border border-[#F8C8DA] shadow-sm hover:scale-105" title="Official Instagram">
+                  <InstagramOfficialLogo className="w-5 h-5" />
+                </a>
+                <a href="https://tiktok.com" target="_blank" rel="noopener noreferrer" className="boutique-btn p-1.5 rounded-xl bg-white border border-[#F8C8DA] shadow-sm hover:scale-105" title="Official TikTok">
+                  <TikTokOfficialLogo className="w-5 h-5" />
+                </a>
+                <a href="https://t.me" target="_blank" rel="noopener noreferrer" className="boutique-btn p-1.5 rounded-xl bg-white border border-[#F8C8DA] shadow-sm hover:scale-105" title="Official Telegram">
+                  <TelegramOfficialLogo className="w-5 h-5" />
+                </a>
+              </div>
+
+              <p className="text-[10px] text-[#4A2E2B]/60">© 2026 Kazuya Store. All Rights Reserved.</p>
+            </div>
+          </footer>
+
+          {/* Floating WhatsApp */}
+          <div className="fixed bottom-5 right-4 z-40">
+            <a
+              href={createGeneralWhatsAppUrl()}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="boutique-btn flex items-center justify-center w-13 h-13 rounded-full bg-[#25D366] text-white shadow-md hover:scale-105"
+            >
+              <WhatsAppOfficialLogo className="w-7 h-7" variant="white" />
+            </a>
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+
+</html>
